@@ -1,0 +1,67 @@
+{
+  "name": "@aaronz345/steam-cli",
+  "version": "0.1.0",
+  "description": "Steam 游戏、评测、成就、价格与账号管理 CLI",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "steam-cli": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "license": "MIT",
+  "files": [
+    "npm-shrinkwrap.json",
+    "dist",
+    "skills",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_LICENSE_DOUBAN",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc && node scripts/postbuild.mjs && node scripts/prepare-runtime.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "lint": "eslint src tests scripts",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run build",
+    "prepack": "npm run verify"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@steipete/sweet-cookie": "0.4.1",
+    "cheerio": "^1.0.0",
+    "commander": "^15.0.0",
+    "qrcode-terminal": "^0.12.0",
+    "steam-session": "^1.9.0",
+    "steam-user": "^5.0.0",
+    "undici": "^7.0.0",
+    "vdf": "^0.0.2",
+    "zod": "^4.0.0"
+  },
+  "overrides": {
+    "protobufjs": "^7.6.3",
+    "adm-zip": "^0.6.1"
+  },
+  "bundleDependencies": [
+    "steam-user",
+    "steam-session"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "eslint": "^10.0.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
