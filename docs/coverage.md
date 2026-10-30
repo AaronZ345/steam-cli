@@ -1,57 +1,39 @@
 # 功能覆盖
 
-盘点日期：2026-10-25。对照公开文档逐项列出能力；“实现”表示已有代码，“实测”以 [validation.md](validation.md) 为准。不能由命令数量推导功能已经全部验证。
+版本 0.2.0，盘点于 2026-10-30。158 个共享操作。实现、模拟测试和真实账号验收分别记录，后端转发不算原生实现。
 
-## 对照项目
+## MCP 源码对照
 
-| 项目 | 主要范围 | 本工具的对应方式 |
-| --- | --- | --- |
-| [nickxudotme/steam-cli](https://github.com/nickxudotme/steam-cli) | 商店、地区价格、ITAD、评价、媒体、DLC、活动、资料、愿望单 | 商店与账号查询、Steamworks 活动日历直接实现；ITAD 需密钥；完整筛选与实时媒体探测尚有差异 |
-| [tamnd/steam-cli](https://github.com/tamnd/steam-cli) | 商店目录、资料、库存市场、多种导出、REST、MCP、图遍历 | 查询、格式、REST、MCP 直接实现；图遍历和 resource URI driver 未实现 |
-| [SteamCMD](https://developer.valvesoftware.com/wiki/SteamCMD) | 安装、更新、校验、Depot、Workshop、开发者命令 | `backend steamcmd -- ...` 衔接；需要单独安装和登录 |
-| [ValvePython/steamctl](https://github.com/ValvePython/steamctl) | Depot、Workshop、SteamID、Web API、TOTP、HL master | SteamID、Web API 直接实现；其余可交给已安装的 steamctl |
-| [dmadisetti/steam-tui](https://github.com/dmadisetti/steam-tui) | SteamCMD 的安装、更新、启动界面 | 提供命令行分发与后端衔接，没有复刻 TUI |
-| [Drackrath/Aurelia](https://github.com/Drackrath/Aurelia) | 无头下载、云同步、Workshop、好友聊天、Proton、合集、运行时 | 常用 Web 和账号能力直接实现；深层下载、同步和运行时管理通过 Aurelia 后端 |
+[逐项覆盖表](parity.md) 和 [机器可读清单](parity.json) 固定了三个源码版本，共 145 个功能点：118 项有直接实现入口，19 项有明确差异，5 项交给本机 Steam 客户端，3 项输出 SDK 集成步骤。这些数量表示映射类型，不表示全部字段等价或每项均已通过真实写入验收。
 
-## 直接实现
+源码实际注册了 Praeses 69 个 action、sharkusmanch 34 个 tool、TMHS 42 个 tool；与项目 README 的宣传计数可能不同。`steam-cli coverage --json` 可读取相同清单，回归测试检查每条映射均指向真实操作。
 
-| 能力 | 命令 | 说明 |
-| --- | --- | --- |
-| 浏览器 Cookie | `login --browser`、`--profile` | 九种浏览器名称；操作系统和加密支持有边界 |
-| Cookie 文件 | `login --cookie-file`、`--cookie-stdin` | JSON、Netscape、请求头 |
-| Steam 手机登录 | `login --qr` | 获取客户端及 Web 登录态，需要用户扫码 |
-| 搜索、目录、榜单 | `search`、`browse`、`deals`、`featured` | StoreQuery 与旧接口适配 |
-| 游戏资料 | `app`、`store-item`、`package`、`dlc`、`media`、`similar` | 原始 Steam 字段和来源 |
-| 当前及地区价格 | `price --compare` | 原币种，未做汇率换算 |
-| 历史及跨店报价 | `history`、`cross-store` | 依赖 IsThereAnyDeal API Key |
-| 社区评价与评分 | `reviews`、`store-item` | 旧 JSON 失效可切社区来源；字段差异明确标注 |
-| 本人评测 | `review list/get/create/edit/delete/vote` | 默认预览；编辑先核验记录，仅传修改字段，再读回 |
-| 游戏库与时长 | `games`、`recent` | 原始分钟值及换算小时；私密资料需权限 |
-| 成就和统计 | `achievements`、`stats` | 全球与个人区分；部分接口需要 Web API Key |
-| 资料与 SteamID | `user`、`resolve` | vanity、个人地址、SteamID2/3/64 |
-| 愿望单和库存 | `wishlist`、`inventory` | 实际写入须 `--execute`；库存使用游标 |
-| 市场 | `market search/price/listings` | 不提供自动买卖下单 |
-| 工坊 | `workshop browse/info/subscribe/unsubscribe` | 下载可衔接后端 |
-| 评论 | `comment list/create` | 资料、工坊、评测评论区 |
-| 云存档 | `cloud list/download` | 下载不覆盖既有文件，暂不直接实现上传与双向同步 |
-| 客户端 | `appinfo`、`friends`、`chat`、`licenses`、`playtime idle` | 需要扫码客户端登录；不绕过私密资料或游戏授权 |
-| 本地游戏 | `local libraries/installed/play/install/verify/uninstall` | 目录查询直接读取；启动和安装等交给 Steam 客户端 |
-| 接入与导出 | `mcp`、`serve`、`skill install`、SDK、`--format` | 写入默认预览；REST 只监听本机 |
+## CLI 与后端对照
 
-## 后端保留能力
+| 来源 | 对应能力与差异 |
+| --- | --- |
+| [tamnd/steam-cli](https://github.com/tamnd/steam-cli/tree/36c8ca826ac829148479d39b4be816fd6ba4f01f) | 商店、社区、格式、REST、MCP、SteamID、资源 URI、有界图遍历均有实现。图遍历目前覆盖 App/DLC/Demo/套餐/工坊合集，不包含全部评价作者与新闻关系；未复制模板输出或所有交互形式。 |
+| [nickxudotme/steam-cli](https://github.com/nickxudotme/steam-cli/tree/0c52c37fbdf70a33378d7d41b7b0072545650c9f) | 商店、地区价格、评价、媒体、DLC、活动、资料、愿望单、ITAD 历史/跨店查询已有。未完整复刻全部媒体探测、商店筛选、别名、双语 UI 与 ITAD 商店筛选。 |
+| [SteamCMD](https://developer.valvesoftware.com/wiki/SteamCMD) | Depot 清单/下载/恢复/SHA1 校验新增原生入口；安装、更新和开发者命令仍可显式衔接已安装的 SteamCMD。 |
+| [ValvePython/steamctl](https://github.com/ValvePython/steamctl) | SteamID、Web API、Guard 代码、HL2 Master 查询已有直接实现；其余特殊命令仍可转发后端。 |
+| [Drackrath/Aurelia](https://github.com/Drackrath/Aurelia) | 新增直接云上传与有基线的冲突同步、Depot、快捷方式、Proton 读取和旧版合集标签。本工具仍未原生复刻现代 Collections 云同步、全部运行时管理、重链接、分支切换和自定义脚本管理。 |
+| [steam-tui](https://github.com/dmadisetti/steam-tui) | 启动、安装、校验、卸载可交给本机 Steam 客户端或后端；没有复刻 TUI。 |
 
-`steam-cli backend NAME -- ...` 对后端参数做进程级转发，不拼接 shell 命令。支持 `steamcmd`、`steamctl`、`aurelia`，可用 `config set NAME_path PATH` 指定程序。
+## 本轮直接增加
 
-后端不存在时返回 `DEPENDENCY_MISSING`。预览返回 `installed=false`；CLI 不会自动下载后端或安装游戏。后端进程退出码为零只代表程序成功退出，不能当作游戏安装、云同步或账号修改已经读回核验。当前本机已安装三种后端并验证启动入口，后端自己的账号登录和实际内容操作未测试。
+- 完整库统计、缩写搜索、未玩/随机游戏、游戏比较、按币种分别估算库现价、愿望单折扣。
+- 成就完成度、完美游戏、最近游玩月份/年份快照。快照明确不等同于逐月或逐次会话时长。
+- 玩家群组、徽章任务、家庭共享状态、全局统计、经济物品、交易报价和历史查询。
+- 本地下载进度、占用与遗留数据、带内容校验的存档备份、游戏移动、启动参数和预设、MangoHud、快捷方式、Lutris 只读数据库/JSON 导入。
+- Proton 版本、映射、前缀、日志、ProtonDB、PCGamingWiki、HowLongToBeat。
+- Depot 清单、下载、恢复及逐文件 SHA1 校验；云存档协议读写、提交后读回和冲突同步。
+- Steamworks 构建/分支/所有权、排行榜、发行商成就/物品/工坊修改、销售报表、素材检查及保存。
+- 原生 MCP Resources 与 `steam://` 模板；新操作的参数定义在 CLI、SDK、MCP、REST 共用。
 
-## 尚未原生实现或充分验证
+## 仍有边界
 
-- 云存档上传、双向冲突同步、Collections 云同步。
-- Depot CDN 下载、断点恢复、降级、分支切换、安装移动和 relink。
-- Proton／Wine／umu／Luxtorpeda 运行时及自定义启动脚本管理。
-- Steam Guard TOTP、交易报价、自动市场买卖、开发者上传、HL master 协议。
-- 图遍历、资源 URI driver、TUI 和全部第三方 CLI 的交互模式。
-- Windows App-Bound Encryption 的解密绕过；不提供绕过实现。
-- 所有操作系统、浏览器组合的真实账号测试，以及真实账号写入测试。
+Cloud 协议文件支持最大 256 MiB；加密文件明确返回不支持，上传使用不加密传输配置。同步没有自动删除或无人确认的冲突覆盖。Depot 默认总量上限 20 GiB，可显式调整；拒绝目录穿越和符号链接。移动仅支持已登记的目标库，不移动工坊内容；Steam 必须退出。
 
-这些项目没有被标注为已完成。对任何 Steam CLI 新版本的新增功能，也不能作永久全覆盖承诺。
+合集修改仅处理旧版 sharedconfig 标签，输出 `modern_collections=false`、`cloud_synced=false`。开发者 API 需要发行商权限和 IP 放行，不能代替普通用户的自有成就读取。素材检查不判断文字、Logo 布局等内容合规；JPEG 只检查结构头和尺寸，不解码全部像素。Lobby、Workshop 创建和 Trailer 仍是 SDK/网页工作流指引，绝不报告已上传或已创建。
+
+浏览器适配保留原有九种浏览器和 profile 选择；Windows App-Bound Encryption 等系统限制不绕过。跨系统浏览器和真实写入的验收状态见 [validation.md](validation.md)。

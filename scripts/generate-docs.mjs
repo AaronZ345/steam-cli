@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync } from "node:fs";
 import { operations } from "../dist/service.js";
 const lines = [
   "# 命令参考",
@@ -43,3 +43,28 @@ const lines = [
   "",
 ];
 writeFileSync(new URL("../docs/cli.md", import.meta.url), lines.join("\n"));
+const parity = JSON.parse(
+  readFileSync(new URL("../docs/parity.json", import.meta.url), "utf8"),
+);
+const sources = [...new Set(parity.entries.map((e) => e.source))];
+const output = [
+  "# MCP 逐项对照",
+  "",
+  `盘点日期：${parity.audited_at}。功能映射不等于字段完全等价或真实写入验收通过；参见 [验证记录](validation.md)。`,
+  "",
+  ...sources.map((source) => {
+    const entries = parity.entries.filter((e) => e.source === source);
+    return `- [${source}](https://github.com/${source}/tree/${entries[0].revision})：${entries.length} 项，源码版本 \`${entries[0].revision}\`。`;
+  }),
+  "",
+  "native 为直接实现入口，partial 有差异，client-dispatch 交给 Steam 客户端，guide 只输出集成步骤。后端转发没有归入 native。",
+  "",
+  "| 来源功能点 | 对应操作 | 类型 | 边界 |",
+  "| --- | --- | --- | --- |",
+  ...parity.entries.map(
+    (e) =>
+      `| ${e.source} / ${e.action} | \`${e.operation}\` | ${e.status} | ${e.note.replaceAll("|", "／")} |`,
+  ),
+  "",
+];
+writeFileSync(new URL("../docs/parity.md", import.meta.url), output.join("\n"));

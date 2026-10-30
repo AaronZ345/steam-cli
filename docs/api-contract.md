@@ -48,3 +48,15 @@
 CLI `--json` 返回统一 envelope；SDK 返回 data 本身，抛出 `CliError`。MCP 的文本结果和 REST 返回相同 envelope。字段原样传递时标明 Steam 来源；CLI 整理的集合使用 `items`。未知值为 `null`，不把不可见当作零。
 
 导出文件使用创建模式，权限 `0600`，目标已存在时拒绝覆盖。Cookie、API Key 和 token 字段在输出时脱敏。
+
+## 0.2.0 协议与本地事务
+
+新操作的 `options` 同时生成 CLI flags、MCP schema 和共享参数校验；SDK/REST 也经过此校验。全局列表原始接口仍保留原分页语义。MCP 提供 `steam-cli://capabilities` 和 `steam://app|package|bundle|user|workshop/{id}` 资源模板。
+
+Cloud 客户端使用 EnumerateUserFiles、ClientFileDownload、ClientBeginFileUpload、块传输、ClientCommitFileUpload，上传后枚举读回 SHA1。私有 CDN 地址和传输请求头不进入输出。传输失败不提交成功，不自动重试；部分同步返回已完成的文件和错误。冲突比较基线、本地和远端 SHA1；删除不会自动传播。
+
+Depot 通过 steam-user 取得解密后的清单和 CDN 内容，拒绝路径越界与符号链接；每个文件按大小和 SHA1 检查，再提交文件名。已有输出目录只有匹配任务且显式 resume 时可恢复。
+
+Steamworks 使用 [ISteamLeaderboards](https://partner.steamgames.com/doc/webapi/ISteamLeaderboards)、[ISteamUserStats](https://partner.steamgames.com/doc/webapi/ISteamUserStats)、[IInventoryService](https://partner.steamgames.com/doc/webapi/IInventoryService)、[IPartnerFinancialsService](https://partner.steamgames.com/doc/webapi/IPartnerFinancialsService) 的发行商接口和独立环境密钥，禁止发送用户 Web Cookie。销售美元按最多六位小数的整数定点累加，输出十进制字符串；未提供的字段保留 null，分页超过上限则拒绝提供完整汇总。
+
+本地配置只在客户端退出时写入，保留未知字段；写入前后检查文件摘要，先生成私有备份，再原子替换并读回。游戏移动先复制核对内容，目标清单可读后才清理源文件；跨库工坊未自动移动。

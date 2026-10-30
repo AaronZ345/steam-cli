@@ -23,6 +23,7 @@ import { login, browsers, verify } from "./auth.js";
 import { loginQR } from "./network.js";
 import { backend } from "./local.js";
 import { mcp, serve } from "./integrations.js";
+import { VERSION } from "./version.js";
 
 function integer(value: string): number {
   return number(value, "value", 0);
@@ -59,7 +60,7 @@ export function program(): Command {
     .description(
       "Steam 游戏、价格、评测、成就与账号工具；支持 CLI、SDK、MCP、REST 和 Agent Skill",
     )
-    .version("0.1.0")
+    .version(VERSION)
     .option("--json", "稳定 JSON 输出，包括错误")
     .option(
       "--format <format>",
@@ -97,6 +98,18 @@ export function program(): Command {
         ? `${leaf} [target]`
         : leaf;
     const cmd = parent.command(syntax).description(op.description);
+    for (const spec of op.options ?? []) {
+      const flag =
+        "--" +
+        spec.name.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase()) +
+        " <value>";
+      const option = new Option(flag, spec.description);
+      if (spec.required) option.makeOptionMandatory();
+      if (spec.choices) option.choices(spec.choices);
+      if (spec.type === "integer") option.argParser(integer);
+      if (spec.type === "boolean") option.argParser(yesno);
+      cmd.addOption(option);
+    }
     if (
       [
         "search",

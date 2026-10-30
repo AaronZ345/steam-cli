@@ -13,12 +13,33 @@
 | 评价与评测 | 社区评价、汇总评分、本人完整评测；创建、编辑、删除、投票；编辑保留未指定字段并读回核验 |
 | 游戏记录 | 游戏库、总时长、近两周时长、最近游玩、个人及全球成就、游戏统计 |
 | 账号与社区 | 资料、SteamID 转换、好友、聊天、徽章、等级、愿望单、库存、市场查询、工坊、云存档下载 |
-| 本地游戏 | 读取 Steam 库目录和安装清单；通过 Steam 客户端分发启动、安装、校验和卸载请求 |
-| 客户端协议 | 手机扫码登录、PICS 元数据、许可证、好友聊天、限时 gamesPlayed 状态 |
+| 本地游戏 | 安装清单、下载进度、磁盘与存档备份、库间移动、启动参数、快捷方式、Proton；启动/安装/校验/卸载仍交给 Steam 客户端 |
+| 客户端协议 | 手机扫码登录、PICS/Depot 下载与 SHA1 校验、恢复下载、云存档上传和冲突同步、许可证、好友聊天 |
+| 开发者 | Steamworks 所有权、分支、构建、排行榜、成就与物品写入、工坊元信息、销售汇总、素材校验与上传；需要对应权限 |
 | 其他工具 | 衔接 SteamCMD、steamctl、Aurelia 的原始命令；后端需要另行安装 |
 | 助手接入 | MCP、Agent Skill、ChatGPT 电脑工具、REST、SDK、诊断、JSON／CSV 等格式 |
 
 能力范围及验证情况见[覆盖表](docs/coverage.md)。当前版本没有完成所有现有 Steam CLI 的逐项功能等价验证；后端转发也不计作原生实现。
+
+## 0.2.0 新增
+
+158 个共享操作可从 CLI、SDK、MCP 和 REST 使用。三套 MCP 源码快照中的 145 个功能点已逐项映射；19 项仍有参数、字段或工作流差异，详见 [parity.md](docs/parity.md)。这不是对所有项目与版本的永久全覆盖承诺。
+
+```bash
+steam-cli coverage --json
+steam-cli local games --query bg3 --json
+steam-cli local disk-report --json
+steam-cli local saves-backup --out /path/to/new-backup --dry-run --json
+steam-cli local launch-options 620 --json
+steam-cli library unplayed --limit 20 --json
+steam-cli insights completion --limit 50 --json
+steam-cli game hltb --query 'Portal 2' --json
+steam-cli crawl 'steam://app/620' --depth 1 --limit 5 --json
+```
+
+本地修改默认预览；`--execute` 才执行，涉及客户端配置时要求 Steam 退出，备份并检查并发修改。云同步使用独立基线，冲突即停，不自动删除。协议下载需要客户端登录；`cloud list/download` 仍可使用 Web 登录，`cloud files/fetch/upload/delete/sync` 使用客户端协议。
+
+开发者接口分别读取 `STEAM_PUBLISHER_API_KEY` 和 `STEAM_FINANCIAL_API_KEY`，不会把普通 Web Cookie 发给发行商 API。素材上传需要独立 Partner Cookie JSON。SDK 指引明确返回 `executed=false`。
 
 ## 安装
 

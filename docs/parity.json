@@ -1,0 +1,1167 @@
+{
+  "audited_at": "2026-10-30",
+  "scope": "Three frozen MCP source snapshots; functional mappings are not proof of field-level equality or live-write success.",
+  "exhaustive_market_parity": false,
+  "entries": [
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "deals.check_sale",
+      "operation": "price",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "deals.wishlist_deals",
+      "operation": "wishlist.deals",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "deals.wishlist",
+      "operation": "wishlist.details",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "deals.library_value",
+      "operation": "library.value",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "diagnostics.compat_log",
+      "operation": "diagnostics.logs",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "diagnostics.shader_log",
+      "operation": "diagnostics.logs",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_config.get_launch_opts",
+      "operation": "local.launch-options",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_config.set_launch_opts",
+      "operation": "local.set-launch-options",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_config.presets",
+      "operation": "local.presets",
+      "status": "partial",
+      "note": "已有八个显式替换预设；不自动合并已有 shell 片段。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_config.mangohud",
+      "operation": "local.set-mangohud",
+      "status": "partial",
+      "note": "可读取和备份写入完整配置；未实现逐项设置和 reset 语法。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_config.steam_settings",
+      "operation": "local.settings",
+      "status": "partial",
+      "note": "只返回白名单设置，避免导出认证字段。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_control.install",
+      "operation": "local.install",
+      "status": "client-dispatch",
+      "note": "交给本机 Steam 客户端；不表示安装/校验已经完成。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_control.uninstall",
+      "operation": "local.uninstall",
+      "status": "client-dispatch",
+      "note": "交给本机 Steam 客户端；不表示安装/校验已经完成。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_control.launch",
+      "operation": "local.play",
+      "status": "client-dispatch",
+      "note": "交给本机 Steam 客户端；不表示安装/校验已经完成。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_control.verify",
+      "operation": "local.verify",
+      "status": "client-dispatch",
+      "note": "交给本机 Steam 客户端；不表示安装/校验已经完成。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_control.move",
+      "operation": "local.move",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_control.store_page",
+      "operation": "local.store-page",
+      "status": "client-dispatch",
+      "note": "交给本机 Steam 客户端；不表示安装/校验已经完成。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_info.reviews",
+      "operation": "reviews",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_info.news",
+      "operation": "news",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_info.media",
+      "operation": "media",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_info.hltb",
+      "operation": "game.hltb",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "game_info.pcgamingwiki",
+      "operation": "game.wiki",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "games.list",
+      "operation": "local.games",
+      "status": "partial",
+      "note": "本地安装读取、大小/名称排序已有；离线全库时长排序未齐。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "games.get",
+      "operation": "local.game",
+      "status": "partial",
+      "note": "本地清单详情已有；不包含全部 Proton/远端融合字段。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "games.search",
+      "operation": "library.search",
+      "status": "partial",
+      "note": "支持个人库缩写搜索和本地名称/首字母检索；完整远端库需认证。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "games.compare",
+      "operation": "library.compare",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "games.random",
+      "operation": "library.random",
+      "status": "partial",
+      "note": "从已拥有的完整远端游戏库随机选择；远端库需认证。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "games.unplayed",
+      "operation": "library.unplayed",
+      "status": "partial",
+      "note": "远端游戏库未玩筛选已有；离线库的时长不完整时不推断为未玩。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "insights.completion",
+      "operation": "insights.completion",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "insights.timeline",
+      "operation": "insights.timeline",
+      "status": "partial",
+      "note": "最近游玩月份快照；不将终身时长伪装成月度时长。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "insights.year_review",
+      "operation": "insights.year",
+      "status": "partial",
+      "note": "最近游玩年份快照；没有 Steam 年度回顾的会话时长数据。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "insights.play_history",
+      "operation": "insights.history",
+      "status": "partial",
+      "note": "终身时长与安装状态；不声称拥有逐次会话历史。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "insights.export",
+      "operation": "games",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "library.list",
+      "operation": "local.libraries",
+      "status": "partial",
+      "note": "库目录可读取；缺少离线盘挂载状态和完整分区容量。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "library.stats",
+      "operation": "local.disk-report",
+      "status": "partial",
+      "note": "安装占用可统计；未复刻原工具离线时长和所有排行字段。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.summary",
+      "operation": "player.summary",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.level",
+      "operation": "level",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.bans",
+      "operation": "bans",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.friends",
+      "operation": "friends.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.achievements",
+      "operation": "achievements",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.global_achievements",
+      "operation": "achievements",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.schema",
+      "operation": "game.schema",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.owned",
+      "operation": "games",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "player.recent",
+      "operation": "recent",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.list_games",
+      "operation": "proton.games",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.info",
+      "operation": "proton.info",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.versions",
+      "operation": "proton.versions",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.db_rating",
+      "operation": "proton.rating",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.recommend",
+      "operation": "proton.recommend",
+      "status": "partial",
+      "note": "提供已安装版本和社区评分候选；缺少完整硬件/驱动规则。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.prefix",
+      "operation": "proton.info",
+      "status": "partial",
+      "note": "读取前缀大小及 Windows 版本；不包含全部 Wine 注册表摘要。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "proton.crash_logs",
+      "operation": "proton.crash-logs",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "shortcuts.list",
+      "operation": "shortcuts.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "shortcuts.add",
+      "operation": "shortcuts.add",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "shortcuts.remove",
+      "operation": "shortcuts.remove",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "shortcuts.import_lutris",
+      "operation": "shortcuts.import-lutris",
+      "status": "native",
+      "note": "读取 Lutris pga.db 中已安装游戏，或 JSON 导出；不执行 runner 配置。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "steam_status.status",
+      "operation": "local.status",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "steam_status.queue",
+      "operation": "local.status",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "steam_status.progress",
+      "operation": "local.progress",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.disk_report",
+      "operation": "local.disk-report",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.orphaned",
+      "operation": "local.orphans",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.cleanup",
+      "operation": "local.cleanup-plan",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.shader_cache",
+      "operation": "local.disk-report",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.shader_stats",
+      "operation": "local.disk-report",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.saves_list",
+      "operation": "local.saves",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.saves_stats",
+      "operation": "local.saves",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "storage.backup",
+      "operation": "local.saves-backup",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "workshop.list",
+      "operation": "workshop.installed",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "workshop.stats",
+      "operation": "workshop.installed",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "Praeses0/steam-mcp",
+      "revision": "8b7307a5ec845612e9e2e58bd23135b6563ec154",
+      "action": "workshop.search",
+      "operation": "workshop.browse",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_player_summary",
+      "operation": "player.summary",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_friends_list",
+      "operation": "friends.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_steam_level",
+      "operation": "level",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "resolve_vanity_url",
+      "operation": "resolve",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_owned_games",
+      "operation": "games",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_recently_played",
+      "operation": "recent",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_game_details",
+      "operation": "app",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_achievements",
+      "operation": "achievements",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_game_stats",
+      "operation": "stats",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_global_achievement_percentages",
+      "operation": "achievements",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_perfect_games",
+      "operation": "insights.perfect",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_achievement_summary",
+      "operation": "insights.completion",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_inventory",
+      "operation": "inventory",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_tf2_inventory",
+      "operation": "economy.items",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_csgo_inventory",
+      "operation": "economy.items",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_dota2_inventory",
+      "operation": "economy.items",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_badges",
+      "operation": "badges",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_player_bans",
+      "operation": "bans",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_game_news",
+      "operation": "news",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_player_count",
+      "operation": "players",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_game_schema",
+      "operation": "game.schema",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_user_groups",
+      "operation": "player.groups",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_badge_progress",
+      "operation": "player.badge-progress",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "is_playing_shared_game",
+      "operation": "player.shared-game",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_global_game_stats",
+      "operation": "game.global-stats",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "search_apps",
+      "operation": "search",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_servers_at_address",
+      "operation": "servers.address",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "check_app_update",
+      "operation": "game.update-check",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_wishlist",
+      "operation": "wishlist.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_wishlist_item_count",
+      "operation": "wishlist.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_trade_offers",
+      "operation": "trade.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_trade_offers_summary",
+      "operation": "trade.summary",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_trade_history",
+      "operation": "trade.history",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "sharkusmanch/steam-mcp-server",
+      "revision": "ce8c8d60ffeb7701b50b102c8d11fe6afe7b9c78",
+      "action": "get_trade_offer",
+      "operation": "trade.get",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_checkAppOwnership",
+      "operation": "publisher.ownership",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_clearAchievement",
+      "operation": "publisher.achievement",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_compareApps",
+      "operation": "library.compare",
+      "status": "partial",
+      "note": "比较价格、配置、类别等；尚未复刻全部社区/媒体融合字段。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_createLobby",
+      "operation": "sdk.guide",
+      "status": "guide",
+      "note": "SDK 集成步骤，不执行 SDK。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getAchievementStats",
+      "operation": "achievements",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getAppBetas",
+      "operation": "publisher.betas",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getAppBuilds",
+      "operation": "publisher.builds",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getAppDetails",
+      "operation": "app",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getAppReviewSummary",
+      "operation": "store-item",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getChangedSalesDates",
+      "operation": "financial.changed",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getDeckCompatibility",
+      "operation": "store-item",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getFeatured",
+      "operation": "featured",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getGlobalStatsForGame",
+      "operation": "game.global-stats",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getInventory",
+      "operation": "inventory",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getLeaderboardEntries",
+      "operation": "leaderboards.entries",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getLeaderboardsForGame",
+      "operation": "leaderboards.list",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getNewsForApp",
+      "operation": "news",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getOwnedGames",
+      "operation": "games",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getPlayerAchievements",
+      "operation": "achievements",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getPlayerBans",
+      "operation": "bans",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getPlayerCount",
+      "operation": "players",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getPlayerSummary",
+      "operation": "player.summary",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getPriceOverview",
+      "operation": "price",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getRegionalPricing",
+      "operation": "price",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getReviews",
+      "operation": "reviews",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getSalesSummary",
+      "operation": "financial.sales",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getSchemaForGame",
+      "operation": "game.schema",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getUserStatsForGame",
+      "operation": "stats",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_getWorkshopItem",
+      "operation": "workshop.info",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_grantInventoryItem",
+      "operation": "publisher.grant",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_partnerLogin",
+      "operation": "publisher.asset-upload",
+      "status": "partial",
+      "note": "上传支持独立 Partner Cookie 文件；尚无交互式 Partner 浏览器登录。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_queryWorkshop",
+      "operation": "workshop.query",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_resolveVanityURL",
+      "operation": "resolve",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_searchApps",
+      "operation": "search",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_setAchievement",
+      "operation": "publisher.achievement",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_updateWorkshopItem",
+      "operation": "publisher.workshop-update",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_uploadLeaderboardScore",
+      "operation": "leaderboards.score",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_uploadStoreImage",
+      "operation": "publisher.asset-upload",
+      "status": "native",
+      "note": "功能入口直接实现；实际验收边界见 validation.md。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_uploadTrailer",
+      "operation": "sdk.guide",
+      "status": "guide",
+      "note": "SDK 集成步骤，不执行 SDK。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_uploadWorkshopItem",
+      "operation": "sdk.guide",
+      "status": "guide",
+      "note": "SDK 集成步骤，不执行 SDK。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_validateStoreAsset",
+      "operation": "assets.validate",
+      "status": "partial",
+      "note": "实现结构、尺寸、格式和透明通道；未实现图像内容启发式。"
+    },
+    {
+      "source": "TMHSDigital/Steam-MCP",
+      "revision": "fce291842eb162bc241f63228dc1c29b7202860c",
+      "action": "steam_validateStoreAssetDir",
+      "operation": "assets.audit",
+      "status": "partial",
+      "note": "目录槽位和成就图标配对已有；不判断文字/拼接线等视觉内容。"
+    }
+  ]
+}

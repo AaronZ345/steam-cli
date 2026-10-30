@@ -14,7 +14,7 @@ import {
   resolveCookieDatabases,
 } from "./browser-cookies.js";
 import { assert, CliError, loadSession, saveSession } from "./core.js";
-import { Client, type Cookie, type Session } from "./http.js";
+import { Client, tokenExpiry, type Cookie, type Session } from "./http.js";
 
 const names = [
   "steamLoginSecure",
@@ -144,9 +144,24 @@ export function sessionFromCookies(cookies: Cookie[], source: string): Session {
 }
 export function status(): object {
   const s = loadSession() as Session | null;
+  const expires = (s?.cookies ?? [])
+    .filter((c) => c.name === "steamLoginSecure")
+    .flatMap((c) => {
+      try {
+        const exp = tokenExpiry(decodeURIComponent(c.value).split("||")[1]);
+        return exp === undefined ? [] : [exp];
+      } catch {
+        return [];
+      }
+    });
+  const expired = expires.length
+    ? expires.every((exp) => exp <= Date.now() / 1000)
+    : null;
   return s
     ? {
-        logged_in: true,
+        logged_in: expired !== true,
+        cached: true,
+        web_token_expired: expired,
         verified: false,
         steamid: s.steamid,
         source: s.source,

@@ -3,7 +3,7 @@ import { promisify } from "node:util";
 import { existsSync, readdirSync, readFileSync, statfsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import vdf from "vdf";
+import vdf from "./text-vdf.js";
 import { appid, assert, config, CliError, redact } from "./core.js";
 
 const executeFile = promisify(execFile);
@@ -182,7 +182,7 @@ export async function launch(
 ): Promise<object> {
   const id = appid(input);
   assert(
-    ["run", "install", "uninstall", "validate"].includes(action),
+    ["run", "install", "uninstall", "validate", "store"].includes(action),
     "INVALID_ARGUMENT",
     "未知 Steam 客户端操作",
   );

@@ -22,6 +22,22 @@ test("MCP protocol initializes, exposes every service operation and runs a safe 
   try {
     const result = await client.listTools();
     assert.equal(result.tools.length, Object.keys(operations).length);
+    const score = result.tools.find(
+      (t) => t.name === "steam_leaderboards_score",
+    )!;
+    assert(score.inputSchema.required?.includes("board"));
+    assert(score.inputSchema.required?.includes("steamid"));
+    const resources = await client.listResources();
+    assert(
+      resources.resources.some((r) => r.uri === "steam-cli://capabilities"),
+    );
+    const read = await client.readResource({ uri: "steam-cli://capabilities" });
+    assert.equal(
+      JSON.parse((read.contents[0] as any).text).operations.length,
+      result.tools.length,
+    );
+    const templates = await client.listResourceTemplates();
+    assert.equal(templates.resourceTemplates.length, 5);
     const doctor = (await client.callTool({
       name: "steam_doctor",
       arguments: {},

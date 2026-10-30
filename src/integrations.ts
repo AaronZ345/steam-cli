@@ -3,15 +3,51 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import {
+  McpServer,
+  ResourceTemplate,
+} from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 import { assert, errorPayload, redact } from "./core.js";
 import { operations, run, capabilities } from "./service.js";
+import { argumentSchema } from "./arguments.js";
+import { VERSION } from "./version.js";
 
 export function mcpServer(): McpServer {
-  const server = new McpServer({ name: "steam-cli", version: "0.1.0" });
+  const server = new McpServer({ name: "steam-cli", version: VERSION });
+  server.registerResource(
+    "capabilities",
+    "steam-cli://capabilities",
+    { mimeType: "application/json" },
+    async (uri) => ({
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: "application/json",
+          text: JSON.stringify(capabilities()),
+        },
+      ],
+    }),
+  );
+  for (const kind of ["app", "package", "bundle", "user", "workshop"])
+    server.registerResource(
+      `steam-${kind}`,
+      new ResourceTemplate(`steam://${kind}/{id}`, { list: undefined }),
+      { mimeType: "application/json" },
+      async (uri) => ({
+        contents: [
+          {
+            uri: uri.href,
+            mimeType: "application/json",
+            text: JSON.stringify(
+              redact(await run("resource.read", { target: uri.href })),
+            ),
+          },
+        ],
+      }),
+    );
   for (const [name, op] of Object.entries(operations)) {
     server.registerTool(
       `steam_${name.replaceAll(".", "_").replaceAll("-", "_")}`,
@@ -63,6 +99,7 @@ export function mcpServer(): McpServer {
           network: z.boolean().optional(),
           verifyLogin: z.boolean().optional(),
           ...(op.write ? { execute: z.boolean().default(false) } : {}),
+          ...argumentSchema(op.options ?? []),
         },
         annotations: {
           readOnlyHint: !op.write,

@@ -1,6 +1,7 @@
 import { EnvHttpProxyAgent, fetch, type Dispatcher } from "undici";
 import { setTimeout as delay } from "node:timers/promises";
 import { CliError, assert, config, loadSession, number } from "./core.js";
+import { VERSION } from "./version.js";
 
 export interface Cookie {
   name: string;
@@ -16,12 +17,23 @@ export interface Session {
   cookies: Cookie[];
   refreshToken?: string;
 }
+export function tokenExpiry(token: string): number | undefined {
+  try {
+    const data = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64url").toString("utf8"),
+    );
+    return typeof data.exp === "number" ? data.exp : undefined;
+  } catch {
+    return undefined;
+  }
+}
 export const HOSTS = new Set([
   "store.steampowered.com",
   "steamcommunity.com",
   "api.steampowered.com",
   "help.steampowered.com",
   "partner.steamgames.com",
+  "partner.steam-api.com",
 ]);
 export function steamURL(input: string): URL {
   const u = new URL(
@@ -97,12 +109,25 @@ export class Client {
     return this.session;
   }
   token(): string | undefined {
+    let expired = false;
     for (const c of this.session?.cookies ?? []) {
       if (c.name === "steamLoginSecure") {
         const [, token] = decodeURIComponent(c.value).split("||");
-        if (token) return token;
+        if (token) {
+          const expiry = tokenExpiry(token);
+          if (expiry && expiry <= Date.now() / 1000) {
+            expired = true;
+            continue;
+          }
+          return token;
+        }
       }
     }
+    assert(
+      !expired,
+      "AUTH_FAILED",
+      "缓存的 Steam Web token 已过期；请重新导入浏览器登录态",
+    );
     return undefined;
   }
   csrf(url: string): string {
@@ -153,7 +178,7 @@ export class Client {
       if (wait > 0) await delay(wait);
       this.last = Date.now();
       const headers: Record<string, string> = {
-        "User-Agent": "steam-cli/0.1.0",
+        "User-Agent": `steam-cli/${VERSION}`,
         "Accept-Language":
           this.language === "schinese"
             ? "zh-CN,zh;q=0.9,en;q=0.8"
@@ -201,8 +226,14 @@ export class Client {
       if ([401, 403].includes(res.status)) {
         await res.body?.cancel();
         throw new CliError(
-          opts.auth ? "AUTH_FAILED" : "ACCESS_DENIED",
-          opts.auth
+          opts.auth ||
+            url.searchParams.has("key") ||
+            url.searchParams.has("access_token")
+            ? "AUTH_FAILED"
+            : "ACCESS_DENIED",
+          opts.auth ||
+            url.searchParams.has("key") ||
+            url.searchParams.has("access_token")
             ? "Steam 认证失败或当前账号无权限"
             : "Steam 拒绝访问，请检查公开性或访问限制",
         );
@@ -250,7 +281,11 @@ export class Client {
       if (eresult && eresult !== "1") {
         await res.body?.cancel();
         throw new CliError(
-          eresult === "15" ? "ACCESS_DENIED" : "API_ERROR",
+          ["5", "63", "65"].includes(eresult)
+            ? "AUTH_FAILED"
+            : eresult === "15"
+              ? "ACCESS_DENIED"
+              : "API_ERROR",
           `Steam EResult ${eresult}`,
         );
       }

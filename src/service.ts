@@ -17,15 +17,23 @@ import * as auth from "./auth.js";
 import * as local from "./local.js";
 import * as network from "./network.js";
 import { itad } from "./prices.js";
+import { featureOperations } from "./feature-ops.js";
+import { extendedOperations } from "./extended-ops.js";
+import { parseArguments, type ArgumentSpec } from "./arguments.js";
+import { VERSION } from "./version.js";
 
 export type Params = Record<string, any>;
 export interface Operation {
   description: string;
   write?: boolean;
   target?: string;
+  options?: ArgumentSpec[];
+  offline?: boolean;
   run: (p: Params, c: Client) => Promise<any> | any;
 }
 export const operations: Record<string, Operation> = {
+  ...featureOperations,
+  ...extendedOperations,
   search: {
     description: "搜索 Steam 游戏名称",
     run: (p, c) => new Store(c).search(p.query || p.target || "", p),
@@ -402,7 +410,7 @@ export const operations: Record<string, Operation> = {
     description: "诊断运行环境、配置、认证和后端",
     run: async (p, c) => {
       const result: any = {
-        version: "0.1.0",
+        version: VERSION,
         node: process.version,
         platform: process.platform,
         config_home: home(),
@@ -410,6 +418,8 @@ export const operations: Record<string, Operation> = {
         language: c.language,
         auth: auth.status(),
         web_api_key: Boolean(process.env.STEAM_WEB_API_KEY),
+        publisher_api_key: Boolean(process.env.STEAM_PUBLISHER_API_KEY),
+        financial_api_key: Boolean(process.env.STEAM_FINANCIAL_API_KEY),
         itad_key: Boolean(
           process.env.ITAD_API_KEY || process.env.STEAM_CLI_ITAD_KEY,
         ),
@@ -443,25 +453,27 @@ export async function run(
       "execute 必须为布尔值",
     );
   const c = new Client({
+    ...(op.offline ? { session: null } : {}),
     country: settings.cc,
     language: settings.lang,
     timeout: settings.timeout,
     interval: settings.rateMs,
   });
   try {
-    return await op.run(p, c);
+    return await op.run(parseArguments(p, op.options), c);
   } finally {
     await c.close();
   }
 }
 export function capabilities(): object {
   return {
-    version: "0.1.0",
+    version: VERSION,
     operations: Object.entries(operations).map(([name, op]) => ({
       name,
       description: op.description,
       write: Boolean(op.write),
       target: op.target ?? null,
+      options: op.options ?? [],
     })),
     backend_integrations: ["steamcmd", "steamctl", "aurelia"],
     exhaustive_parity: false,
