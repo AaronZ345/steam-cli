@@ -1,5 +1,11 @@
 # 验证记录
 
+## 0.2.1 — 2026-10-30
+
+新增 Steam App Cookie 导入的八项测试：来源发现及 profile 隔离、仅选 Steam 字段、过滤过期/分区 Cookie、macOS CBC 和 host hash、拒绝钥匙串后保留缓存、Linux basic CBC、Windows GCM/当前用户密钥解包、App-Bound 拒绝、核验后保存与同账号凭据保留、过期及多账号拒绝、CLI 来源冲突与预览。全套共 57 项，lint、类型检查、测试和构建均通过。发行包干净安装后 CLI 跨目录调用、SDK 导入、MCP 的 159 个工具和 Steam App 来源预览均通过；源码及发行包审计为零漏洞，依赖树检查通过。Windows/Linux 密码格式测试使用模拟材料，未在对应系统的真实 Steam 安装上验收。
+
+本机只读检查已找到 Steam 正在使用的 CEF Cookie 数据库，schema 23，商店及社区的登录 Cookie 为 v10 加密。系统钥匙串读取返回认证失败（security 退出码 51），已立即报告；没有继续扫描其他钥匙串或其他浏览器，没有更新旧缓存，没有修改 Steam 配置或系统权限。真实解密及账号在线核验待系统授权。
+
 ## 0.2.0 — 2026-10-30
 
 `npm run verify` 包含 lint、TypeScript 类型检查、49 项测试与构建。测试使用虚构账号、临时目录、模拟 HTTP/客户端传输和本机临时服务，未修改真实 Steam 配置。

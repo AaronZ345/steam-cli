@@ -99,6 +99,7 @@
 | `steam-cli publisher workshop-update` | publishedfileid | 写入，默认预览 | 发行商修改工坊条目元信息，不上传文件 |
 | `steam-cli financial changed` | 可选参数 | 读取 | 获取有销售数据变更的日期及后续水位 |
 | `steam-cli financial sales` | 可选参数 | 读取 | 完整分页汇总最多 31 天销售，十进制定点美元 |
+| `steam-cli auth steam-client` | 可选参数 | 写入，默认预览 | 发现 Steam App Cookie 来源；execute 后解密、核验并导入 |
 | `steam-cli search` | 可选参数 | 读取 | 搜索 Steam 游戏名称 |
 | `steam-cli browse` | 可选参数 | 读取 | 分页浏览商店目录 |
 | `steam-cli app` | appid | 读取 | 游戏详情、发行信息、配置需求和售价 |
@@ -167,7 +168,7 @@
 
 ## 登录与工具
 
-登录：`login --browser NAME [--profile PROFILE]`、`login --cookie-file PATH`、`login --cookie-stdin`、`login --qr`。另有 `logout`、`browsers`、`auth verify`。
+登录：`login --steam-client [--steam-path ROOT] [--profile PROFILE]`、`login --browser NAME [--profile PROFILE]`、`login --cookie-file PATH`、`login --cookie-stdin`、`login --qr`。另有 `logout`、`browsers`、`auth verify`。
 
 配置：`config show`、`config set KEY VALUE`。允许 country、language、steam_path、steamcmd_path、steamctl_path、aurelia_path。修改配置的命令会返回文件路径与修改项。
 

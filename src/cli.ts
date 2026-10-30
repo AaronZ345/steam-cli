@@ -299,35 +299,54 @@ export function program(): Command {
     .action(() => output(browsers()));
   cli
     .command("login")
-    .description("读取本机浏览器 Cookie 或 Steam 手机扫码登录")
+    .description("读取本机浏览器、Steam App Cookie 或手机扫码登录")
+    .addOption(
+      new Option(
+        "--steam-client",
+        "读取已安装 Steam App 的网页登录态",
+      ).conflicts(["browser", "qr", "cookieFile", "cookieStdin"]),
+    )
+    .addOption(
+      new Option(
+        "--steam-path <path>",
+        "Steam 安装根目录，配合 --steam-client",
+      ).conflicts(["browser", "qr", "cookieFile", "cookieStdin"]),
+    )
+    .addOption(
+      new Option(
+        "--keychain-service <name>",
+        "macOS Steam CEF 的钥匙串 service，默认 Chromium Safe Storage",
+      ).conflicts(["browser", "qr", "cookieFile", "cookieStdin"]),
+    )
     .addOption(
       new Option(
         "--browser <name>",
         "chrome|edge|chromium|brave|vivaldi|opera|arc|firefox|safari",
-      ).conflicts(["qr", "cookieFile", "cookieStdin"]),
+      ).conflicts(["qr", "cookieFile", "cookieStdin", "steamClient"]),
     )
     .option(
       "--profile <name-or-path>",
-      "浏览器资料名称、目录或 Cookie 数据库路径",
+      "浏览器或 Steam CEF 资料名称、目录或 Cookie 数据库路径",
     )
     .addOption(
       new Option("--qr", "Steam 手机扫码，支持客户端功能").conflicts([
         "browser",
         "cookieFile",
         "cookieStdin",
+        "steamClient",
       ]),
     )
     .addOption(
       new Option(
         "--cookie-file <path>",
         "JSON、Netscape 或请求头文件",
-      ).conflicts(["browser", "qr", "cookieStdin"]),
+      ).conflicts(["browser", "qr", "cookieStdin", "steamClient"]),
     )
     .addOption(
       new Option(
         "--cookie-stdin",
         "从管道读取 Cookie，不放进命令行参数",
-      ).conflicts(["browser", "qr", "cookieFile"]),
+      ).conflicts(["browser", "qr", "cookieFile", "steamClient"]),
     )
     .option("--qr-timeout <seconds>", "扫码时限，默认 120 秒", integer)
     .action(async (opts) =>

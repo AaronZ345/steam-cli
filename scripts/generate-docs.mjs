@@ -16,7 +16,7 @@ const lines = [
   "",
   "## 登录与工具",
   "",
-  "登录：`login --browser NAME [--profile PROFILE]`、`login --cookie-file PATH`、`login --cookie-stdin`、`login --qr`。另有 `logout`、`browsers`、`auth verify`。",
+  "登录：`login --steam-client [--steam-path ROOT] [--profile PROFILE]`、`login --browser NAME [--profile PROFILE]`、`login --cookie-file PATH`、`login --cookie-stdin`、`login --qr`。另有 `logout`、`browsers`、`auth verify`。",
   "",
   "配置：`config show`、`config set KEY VALUE`。允许 country、language、steam_path、steamcmd_path、steamctl_path、aurelia_path。修改配置的命令会返回文件路径与修改项。",
   "",

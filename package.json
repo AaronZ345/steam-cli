@@ -1,6 +1,6 @@
 {
   "name": "@aaronz345/steam-cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Steam 游戏、评测、成就、价格与账号管理 CLI",
   "type": "module",
   "main": "dist/index.js",

@@ -1,6 +1,6 @@
 # 功能覆盖
 
-版本 0.2.0，盘点于 2026-10-30。158 个共享操作。实现、模拟测试和真实账号验收分别记录，后端转发不算原生实现。
+版本 0.2.1，盘点于 2026-10-30。159 个共享操作。实现、模拟测试和真实账号验收分别记录，后端转发不算原生实现。
 
 ## MCP 源码对照
 
@@ -36,4 +36,4 @@ Cloud 协议文件支持最大 256 MiB；加密文件明确返回不支持，上
 
 合集修改仅处理旧版 sharedconfig 标签，输出 `modern_collections=false`、`cloud_synced=false`。开发者 API 需要发行商权限和 IP 放行，不能代替普通用户的自有成就读取。素材检查不判断文字、Logo 布局等内容合规；JPEG 只检查结构头和尺寸，不解码全部像素。Lobby、Workshop 创建和 Trailer 仍是 SDK/网页工作流指引，绝不报告已上传或已创建。
 
-浏览器适配保留原有九种浏览器和 profile 选择；Windows App-Bound Encryption 等系统限制不绕过。跨系统浏览器和真实写入的验收状态见 [validation.md](validation.md)。
+新增 Steam App CEF Cookie 来源，支持显式安装目录和 profile；macOS 实机已发现数据库，但钥匙串尚未授权解密。浏览器适配保留原有九种浏览器和 profile 选择；Windows App-Bound Encryption 等系统限制不绕过。跨系统浏览器和真实写入的验收状态见 [validation.md](validation.md)。

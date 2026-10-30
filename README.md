@@ -21,6 +21,20 @@
 
 能力范围及验证情况见[覆盖表](docs/coverage.md)。当前版本没有完成所有现有 Steam CLI 的逐项功能等价验证；后端转发也不计作原生实现。
 
+## Steam App 登录（0.2.1）
+
+当前版本有 159 个共享操作。可以从 Steam 客户端内嵌浏览器的 Cookie 数据库导入网页登录态：
+
+```bash
+steam-cli auth steam-client --json  # 只发现来源，不解密或导入
+steam-cli login --steam-client --json
+steam-cli login --steam-client --steam-path /path/to/Steam --profile Default --json
+```
+
+macOS 使用系统钥匙串解密；系统未授权时明确退出并保留旧缓存。默认 service 是 `Chromium Safe Storage`，自定义 CEF 安装可显式指定 `--keychain-service`。Linux 支持 basic/keyring CBC；Windows 支持当前用户 DPAPI/GCM，App-Bound v20 不绕过。只有本机 macOS 来源发现经过实测；当前钥匙串拒绝访问，解密和账号核验尚未完成真实验收。跨平台密码格式使用虚构数据测试。
+
+读取到的是 Web Cookie，可用于社区和商店功能；需要客户端协议 refresh token 的 Depot/Cloud 等功能仍使用扫码认证。已有同账号客户端凭据会保留。这个命令不会改 Steam Cookie 数据库或客户端配置。
+
 ## 0.2.0 新增
 
 158 个共享操作可从 CLI、SDK、MCP 和 REST 使用。三套 MCP 源码快照中的 145 个功能点已逐项映射；19 项仍有参数、字段或工作流差异，详见 [parity.md](docs/parity.md)。这不是对所有项目与版本的永久全覆盖承诺。

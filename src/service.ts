@@ -21,6 +21,7 @@ import { featureOperations } from "./feature-ops.js";
 import { extendedOperations } from "./extended-ops.js";
 import { parseArguments, type ArgumentSpec } from "./arguments.js";
 import { VERSION } from "./version.js";
+import { steamClientSources } from "./steam-client-cookies.js";
 
 export type Params = Record<string, any>;
 export interface Operation {
@@ -34,6 +35,39 @@ export interface Operation {
 export const operations: Record<string, Operation> = {
   ...featureOperations,
   ...extendedOperations,
+  "auth.steam-client": {
+    description: "发现 Steam App Cookie 来源；execute 后解密、核验并导入",
+    write: true,
+    offline: true,
+    options: [
+      { name: "root", description: "Steam 安装根目录", type: "string" },
+      {
+        name: "profile",
+        description: "CEF 资料名称或 Cookie 路径",
+        type: "string",
+      },
+      {
+        name: "keychainService",
+        description: "macOS 钥匙串 service",
+        type: "string",
+      },
+    ],
+    run: (p) =>
+      p.execute
+        ? auth.importSteamClient({
+            root: p.root,
+            profile: p.profile,
+            keychainService: p.keychainService,
+          })
+        : {
+            dry_run: true,
+            ...steamClientSources({
+              root: p.root,
+              profile: p.profile,
+              keychainService: p.keychainService,
+            }),
+          },
+  },
   search: {
     description: "搜索 Steam 游戏名称",
     run: (p, c) => new Store(c).search(p.query || p.target || "", p),
@@ -417,6 +451,7 @@ export const operations: Record<string, Operation> = {
         country: c.country,
         language: c.language,
         auth: auth.status(),
+        steam_client: steamClientSources(),
         web_api_key: Boolean(process.env.STEAM_WEB_API_KEY),
         publisher_api_key: Boolean(process.env.STEAM_PUBLISHER_API_KEY),
         financial_api_key: Boolean(process.env.STEAM_FINANCIAL_API_KEY),

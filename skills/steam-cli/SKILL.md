@@ -1,6 +1,6 @@
 ---
 name: steam-cli
-description: 查询 Steam 游戏价格、评价、成就、游戏库和时长，读取本机浏览器登录态，编辑本人游戏评测，管理愿望单、库存、工坊和云存档；支持本地库、Depot 下载、云同步、Steamworks、MCP、REST 和 Steam 后端衔接。
+description: 查询 Steam 游戏价格、评价、成就、游戏库和时长，读取本机浏览器或 Steam App 登录态，编辑本人游戏评测，管理愿望单、库存、工坊和云存档；支持本地库、Depot 下载、云同步、Steamworks、MCP、REST 和 Steam 后端衔接。
 metadata:
   origin: local
   owner: aaron
@@ -23,6 +23,11 @@ steam-cli reviews 620 --limit 5 --json
 `store-item` 包含汇总好评率、标签、购买选项、Steam Deck 信息；`achievements APPID` 是全球成就，`achievements APPID --user me` 是个人成就。`games --sort playtime --json` 读取游戏库和时长，分钟是原始单位，`playtime_hours` 是换算小时。
 
 ## 登录
+
+用户使用 Steam 桌面客户端时，先用 `steam-cli auth steam-client --json` 发现来源，再用 `steam-cli login --steam-client --json` 导入。可用 `--steam-path ROOT`、`--profile NAME_OR_PATH` 精确选择。macOS 需系统钥匙串授权，默认 service 是 `Chromium Safe Storage`；被拒绝时报告卡点并保留原缓存，禁止改 ACL、解锁钥匙串或偷偷换来源。来源发现成功不代表解密/账号核验成功。
+
+Steam App Cookie 提供 Web 登录态，Depot/Cloud 客户端协议仍需有效的客户端凭据；不要把 Web 导入描述成已完成客户端扫码登录。同账号已缓存的客户端凭据会保留。
+
 
 `steam-cli login --browser chrome` 读取本机 Steam Cookie；支持 edge、chromium、brave、vivaldi、opera、arc、firefox、safari。`--profile` 精确选择账号资料。无法解密时保留错误，不读取别的浏览器冒充所选来源。
 

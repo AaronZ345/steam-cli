@@ -60,3 +60,11 @@ Depot 通过 steam-user 取得解密后的清单和 CDN 内容，拒绝路径越
 Steamworks 使用 [ISteamLeaderboards](https://partner.steamgames.com/doc/webapi/ISteamLeaderboards)、[ISteamUserStats](https://partner.steamgames.com/doc/webapi/ISteamUserStats)、[IInventoryService](https://partner.steamgames.com/doc/webapi/IInventoryService)、[IPartnerFinancialsService](https://partner.steamgames.com/doc/webapi/IPartnerFinancialsService) 的发行商接口和独立环境密钥，禁止发送用户 Web Cookie。销售美元按最多六位小数的整数定点累加，输出十进制字符串；未提供的字段保留 null，分页超过上限则拒绝提供完整汇总。
 
 本地配置只在客户端退出时写入，保留未知字段；写入前后检查文件摘要，先生成私有备份，再原子替换并读回。游戏移动先复制核对内容，目标清单可读后才清理源文件；跨库工坊未自动移动。
+
+## Steam App Cookie
+
+`auth.steam-client` 默认只发现 Cookie 数据库路径，`execute=true` 才解密、通过 Steam 社区核验并更新本工具的加密缓存。CLI 快捷入口为 `login --steam-client`，该显式登录命令直接导入；可提供安装根目录或精确 CEF profile。只查询 Steam 域名与规定 Cookie 名称，数据库以只读方式打开，过滤过期和第三方分区记录。不会修改 Steam 数据库、SSFN 文件、客户端配置或钥匙串 ACL。
+
+macOS CBC 使用系统授权的 Safe Storage 项目。CEF 的 [keychain_service_name](https://github.com/chromiumembedded/cef/blob/master/include/internal/cef_types.h) 支持应用自定义；本工具默认 `Chromium Safe Storage`，由用户显式覆盖。拒绝授权时返回 `KEYCHAIN_ACCESS_DENIED`，不换用其他浏览器或服务。Windows DPAPI 使用当前用户，密文通过进程管道传递，不把解密材料放进命令行；v20 明确返回 `UNSUPPORTED_ENCRYPTION`。CBC/GCM 的新版 host hash 会核对对应域名。
+
+导入前拒绝已知过期 token 和混合账号，核验成功才保存。仅在 SteamID 相同时保留原有客户端 refresh token。Steam App Web Cookie 不等同于客户端协议凭据，不能据此报告扫码认证已完成。

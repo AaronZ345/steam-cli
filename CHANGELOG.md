@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-10-30
+
+- 新增 `login --steam-client`，读取 Steam CEF Cookie，核验账号后才更新加密缓存；保留同账号已有客户端凭据。
+- 新增共享的 `auth.steam-client` 发现/导入操作与 doctor 来源诊断，操作总数为 159。
+- 加入 macOS Keychain、Linux CBC 和 Windows 当前用户 DPAPI/GCM 适配；App-Bound v20 明确不支持。
+- 新增八项认证回归测试，总计 57 项；实机解密仍受系统钥匙串授权阻挡，未标为真实登录成功。
+
 ## 0.2.0 — 2026-10-30
 
 - 共享操作从 65 个扩展至 158 个；新增库统计、本地管理、Depot/Cloud、交易查询、Steamworks 与资源 URI。

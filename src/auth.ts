@@ -15,6 +15,10 @@ import {
 } from "./browser-cookies.js";
 import { assert, CliError, loadSession, saveSession } from "./core.js";
 import { Client, tokenExpiry, type Cookie, type Session } from "./http.js";
+import {
+  readSteamClientCookies,
+  type SteamCookieOptions,
+} from "./steam-client-cookies.js";
 
 const names = [
   "steamLoginSecure",
@@ -202,10 +206,31 @@ export async function verify(session: Session): Promise<object> {
 }
 export async function login(opts: {
   browser?: string;
+  steamClient?: boolean;
+  steamPath?: string;
+  keychainService?: string;
   profile?: string;
   cookieFile?: string;
   cookieStdin?: boolean;
 }): Promise<object> {
+  const sources = [
+    Boolean(opts.browser),
+    Boolean(opts.steamClient),
+    Boolean(opts.cookieFile),
+    Boolean(opts.cookieStdin),
+  ].filter(Boolean).length;
+  assert(sources <= 1, "INVALID_ARGUMENT", "登录来源只能选择一个");
+  assert(
+    opts.steamClient || (!opts.steamPath && !opts.keychainService),
+    "INVALID_ARGUMENT",
+    "--steam-path 和 --keychain-service 需要 --steam-client",
+  );
+  if (opts.steamClient)
+    return importSteamClient({
+      root: opts.steamPath,
+      profile: opts.profile,
+      keychainService: opts.keychainService,
+    });
   let session: Session;
   if (opts.cookieFile || opts.cookieStdin) {
     assert(
@@ -308,6 +333,50 @@ export async function login(opts: {
   const result = await verify(session);
   saveSession(session as unknown as Record<string, unknown>);
   return result;
+}
+export async function importSteamClient(
+  opts: SteamCookieOptions = {},
+  deps: {
+    read?: (
+      opts: SteamCookieOptions,
+    ) => ReturnType<typeof readSteamClientCookies>;
+    verify?: (session: Session) => Promise<object>;
+    save?: (session: Record<string, unknown>) => void;
+    previous?: () => Session | null;
+  } = {},
+): Promise<object> {
+  const result = await (deps.read ?? readSteamClientCookies)(opts),
+    session = sessionFromCookies(result.cookies, "steam-client");
+  const loginCookies = session.cookies.filter(
+    (c) => c.name === "steamLoginSecure",
+  );
+  assert(
+    loginCookies.some((c) => {
+      const expires = tokenExpiry(decodeURIComponent(c.value).split("||")[1]);
+      return expires === undefined || expires > Date.now() / 1000;
+    }),
+    "AUTH_FAILED",
+    "Steam App 缓存中的网页登录态已过期；请在客户端打开商店或社区刷新登录",
+  );
+  const previous = (deps.previous ?? loadSession)() as Session | null;
+  if (previous?.steamid === session.steamid && previous.refreshToken)
+    session.refreshToken = previous.refreshToken;
+  const verified = await (deps.verify ?? verify)(session);
+  assert(
+    (verified as any).verified === true,
+    "AUTH_FAILED",
+    "Steam App 登录态没有通过账号核验，未保存缓存",
+  );
+  (deps.save ?? saveSession)(session as unknown as Record<string, unknown>);
+  return {
+    ...verified,
+    source: "steam-client",
+    credential_kind: "web-cookie",
+    client_auth: Boolean(session.refreshToken),
+    cache_updated: true,
+    stores: result.stores,
+    warnings: result.warnings,
+  };
 }
 async function readStdin(): Promise<string> {
   assert(
