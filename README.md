@@ -23,7 +23,7 @@
 
 ## Steam App 登录（0.2.1）
 
-当前版本有 159 个共享操作。可以从 Steam 客户端内嵌浏览器的 Cookie 数据库导入网页登录态：
+当前版本有 159 个共享操作。可以从 Steam 客户端内嵌浏览器的 Cookie 数据库导入网页登录态，实际验收范围见[验证记录](docs/validation.md)：
 
 ```bash
 steam-cli auth steam-client --json  # 只发现来源，不解密或导入
@@ -31,7 +31,7 @@ steam-cli login --steam-client --json
 steam-cli login --steam-client --steam-path /path/to/Steam --profile Default --json
 ```
 
-macOS 使用系统钥匙串解密；系统未授权时明确退出并保留旧缓存。默认 service 是 `Chromium Safe Storage`，自定义 CEF 安装可显式指定 `--keychain-service`。Linux 支持 basic/keyring CBC；Windows 支持当前用户 DPAPI/GCM，App-Bound v20 不绕过。只有本机 macOS 来源发现经过实测；当前钥匙串拒绝访问，解密和账号核验尚未完成真实验收。跨平台密码格式使用虚构数据测试。
+macOS 使用系统钥匙串解密；系统未授权时明确退出并保留旧缓存。默认 service 是 `Chromium Safe Storage`，自定义 CEF 安装可显式指定 `--keychain-service`。Linux 支持 basic/keyring CBC；Windows 支持当前用户 DPAPI/GCM，App-Bound v20 不绕过。macOS 来源发现经过实机检查，但该环境的钥匙串拒绝访问，因此真实解密和账号核验尚未通过；跨平台解密格式使用虚构数据测试。
 
 读取到的是 Web Cookie，可用于社区和商店功能；需要客户端协议 refresh token 的 Depot/Cloud 等功能仍使用扫码认证。已有同账号客户端凭据会保留。这个命令不会改 Steam Cookie 数据库或客户端配置。
 
@@ -60,6 +60,8 @@ steam-cli crawl 'steam://app/620' --depth 1 --limit 5 --json
 需要 Node.js 22.13 或更新版本。发行依赖使用 `npm-shrinkwrap.json` 锁定。从源码安装：
 
 ```bash
+git clone https://github.com/AaronZ345/steam-cli.git
+cd steam-cli
 npm ci
 npm run build
 npm link --ignore-scripts
@@ -67,7 +69,7 @@ steam-cli --version
 steam-cli doctor --json
 ```
 
-也可运行 `npm pack` 生成发行包，然后 `npm install -g /path/to/aaronz345-steam-cli-0.1.0.tgz --ignore-scripts`。命令名是 `steam-cli`。
+也可运行 `npm pack` 生成发行包，然后 `npm install -g /path/to/aaronz345-steam-cli-0.2.1.tgz --ignore-scripts`。命令名是 `steam-cli`。
 
 ## 常用命令
 
@@ -211,10 +213,11 @@ steam-cli games --limit 1000 --format csv --output ./games.csv
 ```bash
 npm ci
 npm run verify
+npm run package:smoke
 npm pack
 ```
 
-默认测试使用虚构 Cookie、响应和模拟 HTTP，不读取真实账号。联网和账号读取另行执行；测试不发表真实评测、评论或聊天消息。浏览器适配基于豆瓣项目的 MIT 代码，原许可保留于 `THIRD_PARTY_LICENSE_DOUBAN`。
+GitHub Actions 在 Linux 的 Node.js 22、26 上运行校验和发行包安装检查。默认测试使用虚构 Cookie、响应和模拟 HTTP，不读取真实账号。联网和账号读取另行执行；测试不发表真实评测、评论或聊天消息。浏览器适配基于豆瓣项目的 MIT 代码，原许可保留于 `THIRD_PARTY_LICENSE_DOUBAN`。
 
 ## 许可证
 

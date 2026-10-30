@@ -34,7 +34,8 @@
     "test": "tsx --test tests/*.test.ts",
     "lint": "eslint src tests scripts",
     "verify": "npm run lint && npm run typecheck && npm test && npm run build",
-    "prepack": "npm run verify"
+    "prepack": "npm run verify",
+    "package:smoke": "node scripts/package-smoke.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
@@ -62,5 +63,19 @@
     "tsx": "^4.0.0",
     "typescript": "^5.9.0",
     "typescript-eslint": "^8.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AaronZ345/steam-cli.git"
+  },
+  "homepage": "https://github.com/AaronZ345/steam-cli#readme",
+  "bugs": {
+    "url": "https://github.com/AaronZ345/steam-cli/issues"
+  },
+  "keywords": [
+    "steam",
+    "cli",
+    "mcp",
+    "steamworks"
+  ]
 }
