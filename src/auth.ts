@@ -11,6 +11,7 @@ import {
 } from "./browser-platform.js";
 import {
   readChromiumCookies,
+  type BrowserCookieResult,
   resolveCookieDatabases,
 } from "./browser-cookies.js";
 import { assert, CliError, loadSession, saveSession } from "./core.js";
@@ -146,6 +147,30 @@ export function sessionFromCookies(cookies: Cookie[], source: string): Session {
     cookies: checked,
   };
 }
+/** Preserve safe importer diagnostics without exposing cookies or filesystem paths. */
+export function sessionFromBrowserCookies(
+  result: BrowserCookieResult,
+  source: string,
+): Session {
+  try {
+    return sessionFromCookies(result.cookies, source);
+  } catch (error) {
+    if (
+      error instanceof CliError &&
+      error.code === "AUTH_REQUIRED" &&
+      result.issues?.length
+    ) {
+      throw new CliError(
+        "BROWSER_COOKIE_IMPORT_FAILED",
+        `${error.message}；${result.warnings.join("；")}`,
+        {
+          issues: result.issues,
+        },
+      );
+    }
+    throw error;
+  }
+}
 export function status(): object {
   const s = loadSession() as Session | null;
   const expires = (s?.cookies ?? [])
@@ -260,6 +285,7 @@ export async function login(opts: {
     );
     const chromium = CHROMIUM_BROWSERS.find((n) => n === name);
     const cookies: Cookie[] = [];
+    let browserResult: BrowserCookieResult | undefined;
     if (
       chromium &&
       (process.platform === "linux" ||
@@ -267,6 +293,7 @@ export async function login(opts: {
     ) {
       const result = await readChromiumCookies(chromium, opts.profile, 15000);
       cookies.push(...result.cookies);
+      browserResult = result;
     } else {
       const backend =
         name === "firefox" || name === "safari" || name === "edge"
@@ -325,10 +352,10 @@ export async function login(opts: {
           });
       }
     }
-    session = sessionFromCookies(
-      cookies,
-      `${name}${opts.profile ? ":selected-profile" : ""}`,
-    );
+    const source = `${name}${opts.profile ? ":selected-profile" : ""}`;
+    session = browserResult
+      ? sessionFromBrowserCookies(browserResult, source)
+      : sessionFromCookies(cookies, source);
   }
   const result = await verify(session);
   saveSession(session as unknown as Record<string, unknown>);

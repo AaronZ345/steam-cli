@@ -22,6 +22,12 @@ export interface BrowserCookieResult {
     source: { browser: "chrome"; profile: string; storeId: string };
   }>;
   warnings: string[];
+  /** Safe reason codes: never include paths, cookie values or backend errors. */
+  issues?: Array<
+    | "PROFILE_NOT_FOUND"
+    | "COOKIE_DECRYPTION_FAILED"
+    | "COOKIE_FORMAT_UNSUPPORTED"
+  >;
 }
 
 function isFile(candidate: string): boolean {
@@ -41,13 +47,14 @@ export function resolveCookieDatabases(
   const p = target.platform === "win32" ? path.win32 : path.posix;
   const selected = profile?.trim();
   let directories: string[];
-  if (
+  const explicitPath = Boolean(
     selected &&
     (p.isAbsolute(selected) ||
       selected.startsWith("~/") ||
       selected.includes("/") ||
-      selected.includes("\\"))
-  ) {
+      selected.includes("\\")),
+  );
+  if (explicitPath && selected) {
     const expanded = selected.startsWith("~/")
       ? p.join(target.home, selected.slice(2))
       : p.resolve(selected);
@@ -103,8 +110,11 @@ export function resolveCookieDatabases(
       p.join(directory, "Network", "Cookies"),
       p.join(directory, "Cookies"),
     ].find(isFile);
-    if (found && !result.some((item) => item.path === found))
+    if (found && !result.some((item) => item.path === found)) {
       result.push({ path: found, profile: p.basename(directory) });
+      // An explicit profile must not also import a nested Default account.
+      if (explicitPath && directory === directories[0]) break;
+    }
   }
   return result;
 }
@@ -250,13 +260,14 @@ export async function readChromiumCookies(
   target = browserEnvironment(),
   secretReader?: StorageSecretReader,
 ): Promise<BrowserCookieResult> {
-  const result: BrowserCookieResult = { cookies: [], warnings: [] };
+  const result: BrowserCookieResult = { cookies: [], warnings: [], issues: [] };
   const databases = resolveCookieDatabases(name, profile, target);
   if (!databases.length)
     return {
       cookies: [],
+      issues: ["PROFILE_NOT_FOUND"],
       warnings: [
-        `未找到 ${name} 的 Cookie 数据库；可用 --profile 指定目录，或使用 --launch 登录`,
+        `未找到 ${name} 的 Cookie 数据库；请用 --profile 指定同一运行环境内可读的资料目录或 Cookies 文件。远程/隔离浏览器的网页登录不会自动传递到 CLI`,
       ],
     };
   const { DatabaseSync } = await import("node:sqlite");
@@ -282,7 +293,8 @@ export async function readChromiumCookies(
             .toString();
           if (
             !passwordRead &&
-            (target.platform === "darwin" || prefix === "v11")
+            ((target.platform === "darwin" && prefix === "v10") ||
+              (target.platform === "linux" && prefix === "v11"))
           ) {
             password = await chromiumStoragePassword(
               name,
@@ -301,8 +313,20 @@ export async function readChromiumCookies(
           );
         }
         if (!value) {
+          const unsupported =
+            row.encrypted_value instanceof Uint8Array &&
+            !["v10", "v11"].includes(
+              Buffer.from(row.encrypted_value).subarray(0, 3).toString(),
+            );
+          result.issues!.push(
+            unsupported
+              ? "COOKIE_FORMAT_UNSUPPORTED"
+              : "COOKIE_DECRYPTION_FAILED",
+          );
           result.warnings.push(
-            "部分 Steam Cookie 无法解密；可用 login --qr 或导入 Cookie 文件",
+            unsupported
+              ? "Steam Cookie 使用当前读取器不支持的加密格式；不能通过重新网页登录解决"
+              : "部分 Steam Cookie 无法解密；请检查所选浏览器的系统密钥环访问权限",
           );
           continue;
         }
@@ -323,5 +347,6 @@ export async function readChromiumCookies(
     }
   }
   result.warnings = [...new Set(result.warnings)];
+  result.issues = [...new Set(result.issues)];
   return result;
 }

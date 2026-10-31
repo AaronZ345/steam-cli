@@ -6,7 +6,7 @@
 
 支持浏览器与 Steam App 登录态导入，提供 CLI、Node.js SDK、MCP、REST 和 Agent Skill。
 
-[![CI](https://github.com/AaronZ345/steam-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/AaronZ345/steam-cli/actions/workflows/ci.yml) [![Version](https://img.shields.io/badge/version-0.2.1-1b2838)](CHANGELOG.md) [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A522.13-43853d)](https://nodejs.org/) [![MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![CI](https://github.com/AaronZ345/steam-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/AaronZ345/steam-cli/actions/workflows/ci.yml) [![Version](https://img.shields.io/badge/version-0.2.2-1b2838)](CHANGELOG.md) [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A522.13-43853d)](https://nodejs.org/) [![MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 [安装](#安装) · [常用命令](#常用命令) · [登录](#登录) · [助手接入](#助手接入) · [文档](#文档) · [开发](#开发)
 
@@ -48,7 +48,7 @@ steam-cli doctor --json
 在源码目录运行 `npm pack`，将生成的发行包复制到目标电脑后安装：
 
 ```bash
-npm install -g /path/to/aaronz345-steam-cli-0.2.1.tgz --ignore-scripts
+npm install -g /path/to/aaronz345-steam-cli-0.2.2.tgz --ignore-scripts
 ```
 
 命令名是 `steam-cli`，发行依赖由 `npm-shrinkwrap.json` 锁定。
@@ -174,6 +174,12 @@ steam-cli login --browser firefox --profile /path/to/profile
 | Safari | 支持，需要系统读取权限 | 不支持 | 不支持 |
 
 表中“支持”表示已实现定位与读取适配；真实账号登录实测范围目前为 macOS Chrome。Chromium 系和 Firefox 的 `--profile` 可指定名称、目录或数据库路径，Safari 不支持此参数。系统钥匙串、keyring 和 App-Bound 加密等限制见[浏览器登录](docs/browser-login.md)。
+
+### 浏览器 Cookie 导入边界
+
+CLI 必须与已登录浏览器位于同一可访问的运行环境；远程或隔离浏览器的网页登录不会自动同步给云端 CLI。默认只读所选浏览器的默认资料，不会扫描其他账号；已知自定义路径可通过 `login --browser chromium --profile /path/to/profile --json` 指定，也支持直接指定 `Cookies` 文件。选中实际资料目录后不会再合并其嵌套 `Default`。
+
+内置 Chromium 读取器（Linux Chromium 系列、macOS Vivaldi/Opera）缺少数据库或解密失败会返回 `BROWSER_COOKIE_IMPORT_FAILED`，`details.issues` 区分 `PROFILE_NOT_FOUND`、`COOKIE_DECRYPTION_FAILED` 与 `COOKIE_FORMAT_UNSUPPORTED`；数据库可读但没有有效登录 Cookie 仍为 `AUTH_REQUIRED`。不支持的加密格式（如 App-Bound v20）不会尝试绕过系统保护；重新登录网页不解决文件隔离或解密权限问题。没有获得可读的受支持资料路径时，不会声称导入成功，也不会改写旧缓存。
 
 ### Steam App
 

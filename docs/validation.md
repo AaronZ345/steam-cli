@@ -1,5 +1,11 @@
 # 验证记录
 
+## 0.2.2 — 2026-10-31
+
+云端 Linux / Node.js 24.22.1：`npm run verify`（lint、typecheck、60 项合成测试、build）通过。新增测试覆盖缺失资料的安全诊断、显式资料与 Cookies 文件选择、嵌套 Default 隔离，以及 Linux/macOS 不支持加密在请求密钥前拒绝。测试 runner 改用 `node --import tsx --test`，避免 tsx CLI 的 IPC 管道依赖。
+
+独立发行包干净安装、159 个操作、CLI / SDK / MCP / REST 冒烟及零漏洞审计通过。云端 wrapper 报告 0.2.2；标准 Chromium 来源导入返回 `BROWSER_COOKIE_IMPORT_FAILED` / `PROFILE_NOT_FOUND`。网页登录与 CLI 可读浏览器资料分离，尚无受支持的会话传递或已知可读 profile 路径；本轮未完成真实账号导入，未改写登录缓存，不将合成测试当作真实账号验收。
+
 ## 0.2.1 — 2026-10-30
 
 新增 Steam App Cookie 导入的八项测试：来源发现及 profile 隔离、仅选 Steam 字段、过滤过期/分区 Cookie、macOS CBC 和 host hash、拒绝钥匙串后保留缓存、Linux basic CBC、Windows GCM/当前用户密钥解包、App-Bound 拒绝、核验后保存与同账号凭据保留、过期及多账号拒绝、CLI 来源冲突与预览。全套共 57 项，lint、类型检查、测试和构建均通过。发行包干净安装后 CLI 跨目录调用、SDK 导入、MCP 的 159 个工具和 Steam App 来源预览均通过；源码及发行包审计为零漏洞，依赖树检查通过。Windows/Linux 密码格式测试使用模拟材料，未在对应系统的真实 Steam 安装上验收。

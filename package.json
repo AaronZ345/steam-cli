@@ -1,6 +1,6 @@
 {
   "name": "@aaronz345/steam-cli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Steam 游戏、评测、成就、价格与账号管理 CLI",
   "type": "module",
   "main": "dist/index.js",
@@ -31,7 +31,7 @@
   "scripts": {
     "build": "tsc && node scripts/postbuild.mjs && node scripts/prepare-runtime.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
     "lint": "eslint src tests scripts",
     "verify": "npm run lint && npm run typecheck && npm test && npm run build",
     "prepack": "npm run verify",
