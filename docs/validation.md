@@ -1,5 +1,9 @@
 # 验证记录
 
+## 0.2.3 — 2026-10-31
+
+对照旧豆瓣 0.4.0+chromium.6 源码，补齐 Linux 的 XDG 与常规根目录回退，以及 Profile N 元数据发现。合成测试覆盖重定向根目录、唯一 Profile N 自动选择、多资料拒绝、跨根目录同名资料拒绝及显式路径选择。`npm run verify`（lint/typecheck、62 项测试、build）以及独立干净安装的 CLI/SDK/MCP/REST 包冒烟全部通过，159 个操作及零漏洞审计通过。当前原生终端重现旧路径探测仍未发现已登录资料；真实账号导入等待该浏览器的明确 profile 路径，不将路径修复与在线登录成功混同。
+
 ## 0.2.2 — 2026-10-31
 
 云端 Linux / Node.js 24.22.1：`npm run verify`（lint、typecheck、60 项合成测试、build）通过。新增测试覆盖缺失资料的安全诊断、显式资料与 Cookies 文件选择、嵌套 Default 隔离，以及 Linux/macOS 不支持加密在请求密钥前拒绝。测试 runner 改用 `node --import tsx --test`，避免 tsx CLI 的 IPC 管道依赖。

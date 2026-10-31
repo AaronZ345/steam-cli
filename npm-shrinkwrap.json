@@ -1,12 +1,12 @@
 {
   "name": "@aaronz345/steam-cli",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@aaronz345/steam-cli",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "bundleDependencies": [
         "steam-user",
         "steam-session"

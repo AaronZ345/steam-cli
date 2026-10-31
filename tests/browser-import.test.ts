@@ -104,3 +104,48 @@ test("unsupported encryption is distinguished from an empty signed-out profile",
     (e: unknown) => e instanceof CliError && e.code === "AUTH_REQUIRED",
   );
 });
+
+test("redirected XDG retains conventional home profiles and selects sole Profile N", () => {
+  const isolatedHome = path.join(home, "xdg-fallback");
+  const redirected = path.join(isolatedHome, "redirected");
+  const profile = path.join(isolatedHome, ".config", "chromium", "Profile 2");
+  mkdirSync(profile, { recursive: true });
+  writeFileSync(path.join(profile, "Cookies"), "fixture");
+  const env = {
+    platform: "linux" as const,
+    home: isolatedHome,
+    env: { XDG_CONFIG_HOME: redirected },
+  };
+  assert.deepEqual(resolveCookieDatabases("chromium", undefined, env), [
+    { path: path.join(profile, "Cookies"), profile: "Profile 2" },
+  ]);
+  const other = path.join(redirected, "chromium", "Default");
+  mkdirSync(other, { recursive: true });
+  writeFileSync(path.join(other, "Cookies"), "fixture");
+  assert.throws(
+    () => resolveCookieDatabases("chromium", undefined, env),
+    (e: unknown) =>
+      e instanceof CliError && e.code === "BROWSER_PROFILE_AMBIGUOUS",
+  );
+  assert.equal(resolveCookieDatabases("chromium", profile, env).length, 1);
+});
+
+test("named profiles duplicated across roots require an explicit path", () => {
+  const h = path.join(home, "duplicate-names");
+  const xdg = path.join(h, "xdg");
+  for (const root of [xdg, path.join(h, ".config")]) {
+    const p = path.join(root, "chromium", "Default");
+    mkdirSync(p, { recursive: true });
+    writeFileSync(path.join(p, "Cookies"), "fixture");
+  }
+  assert.throws(
+    () =>
+      resolveCookieDatabases("chromium", "Default", {
+        platform: "linux",
+        home: h,
+        env: { XDG_CONFIG_HOME: xdg },
+      }),
+    (e: unknown) =>
+      e instanceof CliError && e.code === "BROWSER_PROFILE_AMBIGUOUS",
+  );
+});

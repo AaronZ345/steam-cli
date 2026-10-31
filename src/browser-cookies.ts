@@ -1,7 +1,8 @@
 import { execFile } from "node:child_process";
 import { createDecipheriv, createHash, pbkdf2Sync } from "node:crypto";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
+import { CliError } from "./core.js";
 import {
   browserEnvironment,
   chromiumProfileRoots,
@@ -72,6 +73,20 @@ export function resolveCookieDatabases(
   } else {
     directories = chromiumProfileRoots(name, target).flatMap((root) => {
       const names = new Set([selected || "Default"]);
+      if (!selected) {
+        try {
+          for (const entry of readdirSync(root, { withFileTypes: true })) {
+            if (entry.isDirectory() && /^Profile \d+$/.test(entry.name))
+              names.add(entry.name);
+          }
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+            throw new CliError(
+              "BROWSER_PROFILE_UNREADABLE",
+              "无法列出浏览器资料目录；请检查访问权限或指定 --profile",
+            );
+        }
+      }
       if (selected && !existsSync(p.join(root, selected))) {
         try {
           const state = JSON.parse(
@@ -116,6 +131,12 @@ export function resolveCookieDatabases(
       if (explicitPath && directory === directories[0]) break;
     }
   }
+  if (result.length > 1)
+    throw new CliError(
+      "BROWSER_PROFILE_AMBIGUOUS",
+      "发现多个浏览器资料；请用 --profile 指定已登录 Steam 的资料目录，未读取 Cookie",
+      { profiles_found: result.length },
+    );
   return result;
 }
 

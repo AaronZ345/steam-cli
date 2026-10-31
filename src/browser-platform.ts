@@ -250,7 +250,13 @@ export function chromiumProfileRoots(
     vivaldi: "vivaldi",
     opera: "opera",
   };
-  const roots = [p.join(config, relative[name])];
+  // Desktop launchers can redirect XDG_CONFIG_HOME without moving profiles.
+  const roots = [
+    ...new Set([
+      p.join(config, relative[name]),
+      p.join(target.home, ".config", relative[name]),
+    ]),
+  ];
   const flatpak = {
     chromium: "org.chromium.Chromium",
     chrome: "com.google.Chrome",
