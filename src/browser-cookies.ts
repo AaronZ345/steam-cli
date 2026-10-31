@@ -1,6 +1,12 @@
 import { execFile } from "node:child_process";
 import { createDecipheriv, createHash, pbkdf2Sync } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  realpathSync,
+  statSync,
+} from "node:fs";
 import path from "node:path";
 import { CliError } from "./core.js";
 import {
@@ -120,13 +126,18 @@ export function resolveCookieDatabases(
     });
   }
   const result: CookieDatabase[] = [];
+  const seen = new Set<string>();
   for (const directory of directories) {
     const found = [
       p.join(directory, "Network", "Cookies"),
       p.join(directory, "Cookies"),
     ].find(isFile);
-    if (found && !result.some((item) => item.path === found)) {
-      result.push({ path: found, profile: p.basename(directory) });
+    if (found) {
+      const resolved = realpathSync(found);
+      if (!seen.has(resolved)) {
+        seen.add(resolved);
+        result.push({ path: found, profile: p.basename(directory) });
+      }
       // An explicit profile must not also import a nested Default account.
       if (explicitPath && directory === directories[0]) break;
     }
@@ -306,9 +317,12 @@ export async function readChromiumCookies(
       );
       const now = BigInt(Date.now() + 11644473600000) * 1000n;
       for (const row of statement.all(now)) {
-        let value =
-          typeof row.value === "string" && row.value ? row.value : null;
-        if (!value && row.encrypted_value instanceof Uint8Array) {
+        let value = typeof row.value === "string" ? row.value : null;
+        if (
+          !value &&
+          row.encrypted_value instanceof Uint8Array &&
+          row.encrypted_value.byteLength > 0
+        ) {
           const prefix = Buffer.from(row.encrypted_value)
             .subarray(0, 3)
             .toString();
@@ -332,25 +346,22 @@ export async function readChromiumCookies(
             target.platform,
             password,
           );
-        }
-        if (!value) {
-          const unsupported =
-            row.encrypted_value instanceof Uint8Array &&
-            !["v10", "v11"].includes(
-              Buffer.from(row.encrypted_value).subarray(0, 3).toString(),
+          if (value === null) {
+            const unsupported = !["v10", "v11"].includes(prefix);
+            result.issues!.push(
+              unsupported
+                ? "COOKIE_FORMAT_UNSUPPORTED"
+                : "COOKIE_DECRYPTION_FAILED",
             );
-          result.issues!.push(
-            unsupported
-              ? "COOKIE_FORMAT_UNSUPPORTED"
-              : "COOKIE_DECRYPTION_FAILED",
-          );
-          result.warnings.push(
-            unsupported
-              ? "Steam Cookie 使用当前读取器不支持的加密格式；不能通过重新网页登录解决"
-              : "部分 Steam Cookie 无法解密；请检查所选浏览器的系统密钥环访问权限",
-          );
-          continue;
+            result.warnings.push(
+              unsupported
+                ? "Steam Cookie 使用当前读取器不支持的加密格式；不能通过重新网页登录解决"
+                : "部分 Steam Cookie 无法解密；请检查所选浏览器的系统密钥环访问权限",
+            );
+            continue;
+          }
         }
+        if (!value) continue;
         result.cookies.push({
           name: String(row.name),
           value,

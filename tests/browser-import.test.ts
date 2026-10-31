@@ -1,6 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import {
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  rmSync,
+  realpathSync,
+  symlinkSync,
+} from "node:fs";
+import { createCipheriv, createHash, pbkdf2Sync } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -147,5 +155,177 @@ test("named profiles duplicated across roots require an explicit path", () => {
       }),
     (e: unknown) =>
       e instanceof CliError && e.code === "BROWSER_PROFILE_AMBIGUOUS",
+  );
+});
+
+test("XDG aliases select one physical profile but still reject distinct profiles", () => {
+  const h = path.join(home, "alias-roots");
+  const config = path.join(h, ".config");
+  const profile = path.join(config, "chromium", "Default");
+  const redirected = path.join(h, "xdg");
+  mkdirSync(profile, { recursive: true });
+  writeFileSync(path.join(profile, "Cookies"), "fixture");
+  symlinkSync(
+    config,
+    redirected,
+    process.platform === "win32" ? "junction" : "dir",
+  );
+  const env = {
+    platform: "linux" as const,
+    home: h,
+    env: { XDG_CONFIG_HOME: redirected },
+  };
+  for (const selection of [undefined, "Default"]) {
+    const selected = resolveCookieDatabases("chromium", selection, env);
+    assert.equal(selected.length, 1);
+    assert.equal(
+      realpathSync(selected[0].path),
+      realpathSync(path.join(profile, "Cookies")),
+    );
+  }
+  const other = path.join(config, "chromium", "Profile 2");
+  mkdirSync(other);
+  writeFileSync(path.join(other, "Cookies"), "fixture");
+  assert.throws(
+    () => resolveCookieDatabases("chromium", undefined, env),
+    (e: unknown) => {
+      assert(e instanceof CliError);
+      assert.equal(e.code, "BROWSER_PROFILE_AMBIGUOUS");
+      assert.deepEqual(e.details, { profiles_found: 2 });
+      return true;
+    },
+  );
+});
+
+function cookieFixture(name: string) {
+  const file = path.join(home, name);
+  const db = new DatabaseSync(file);
+  db.exec(
+    "CREATE TABLE meta(key TEXT,value TEXT); INSERT INTO meta VALUES('version','24'); CREATE TABLE cookies(host_key TEXT,name TEXT,value TEXT,encrypted_value BLOB,path TEXT,expires_utc INTEGER)",
+  );
+  return { file, db };
+}
+
+const rejectSecretRead = async (): Promise<never> => {
+  throw new Error("synthetic Linux basic/empty cookies must not request a key");
+};
+
+test("empty plaintext cookies retain signed-out diagnostics without decryption errors", async () => {
+  const { file, db } = cookieFixture("empty-plain.sqlite");
+  try {
+    const insert = db.prepare("INSERT INTO cookies VALUES(?,?,?,?,?,?)");
+    for (const name of ["lastagecheckage", "sessionid", "steamLoginSecure"])
+      for (const encrypted of [Buffer.alloc(0), null])
+        insert.run(".steamcommunity.com", name, "", encrypted, "/", 0);
+  } finally {
+    db.close();
+  }
+  const result = await readChromiumCookies(
+    "chromium",
+    file,
+    100,
+    target,
+    rejectSecretRead,
+  );
+  assert.deepEqual(result.cookies, []);
+  assert.deepEqual(result.issues, []);
+  assert.deepEqual(result.warnings, []);
+  assert.throws(
+    () => sessionFromBrowserCookies(result, "chromium"),
+    (e: unknown) => e instanceof CliError && e.code === "AUTH_REQUIRED",
+  );
+});
+
+test("successfully decrypted empty cookies are skipped without hiding valid login", async () => {
+  const { file, db } = cookieFixture("empty-encrypted.sqlite");
+  const host = ".steamcommunity.com";
+  const key = pbkdf2Sync("peanuts", "saltysalt", 1, 16, "sha1");
+  const cipher = createCipheriv("aes-128-cbc", key, Buffer.alloc(16, 0x20));
+  const encrypted = Buffer.concat([
+    Buffer.from("v10"),
+    cipher.update(createHash("sha256").update(host).digest()),
+    cipher.final(),
+  ]);
+  try {
+    db.prepare("INSERT INTO cookies VALUES(?,?,?,?,?,?)").run(
+      host,
+      "lastagecheckage",
+      "",
+      encrypted,
+      "/",
+      0,
+    );
+  } finally {
+    db.close();
+  }
+  const empty = await readChromiumCookies(
+    "chromium",
+    file,
+    100,
+    target,
+    rejectSecretRead,
+  );
+  assert.deepEqual(empty.issues, []);
+  assert.deepEqual(empty.warnings, []);
+  assert.throws(
+    () => sessionFromBrowserCookies(empty, "chromium"),
+    (e: unknown) => e instanceof CliError && e.code === "AUTH_REQUIRED",
+  );
+  const update = new DatabaseSync(file);
+  try {
+    update
+      .prepare("INSERT INTO cookies VALUES(?,?,?,?,?,?)")
+      .run(
+        host,
+        "steamLoginSecure",
+        "76561198000000000||synthetic-test-only",
+        Buffer.alloc(0),
+        "/",
+        0,
+      );
+  } finally {
+    update.close();
+  }
+  const loggedIn = await readChromiumCookies(
+    "chromium",
+    file,
+    100,
+    target,
+    rejectSecretRead,
+  );
+  assert.deepEqual(loggedIn.issues, []);
+  assert.deepEqual(loggedIn.warnings, []);
+  assert.equal(
+    sessionFromBrowserCookies(loggedIn, "chromium").steamid,
+    "76561198000000000",
+  );
+});
+
+test("nonempty malformed encrypted cookies still report decryption failure", async () => {
+  const { file, db } = cookieFixture("broken-encrypted.sqlite");
+  try {
+    db.prepare("INSERT INTO cookies VALUES(?,?,?,?,?,?)").run(
+      ".steamcommunity.com",
+      "steamLoginSecure",
+      "",
+      Buffer.concat([Buffer.from("v10"), Buffer.alloc(1)]),
+      "/",
+      0,
+    );
+  } finally {
+    db.close();
+  }
+  const result = await readChromiumCookies(
+    "chromium",
+    file,
+    100,
+    target,
+    rejectSecretRead,
+  );
+  assert.deepEqual(result.issues, ["COOKIE_DECRYPTION_FAILED"]);
+  assert.throws(
+    () => sessionFromBrowserCookies(result, "chromium"),
+    (e: unknown) =>
+      e instanceof CliError && e.code === "BROWSER_COOKIE_IMPORT_FAILED",
   );
 });
